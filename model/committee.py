@@ -1,21 +1,14 @@
-import pandas as pd
+""" This is the Committee model """
+from .base import BaseModel
+from . import base
 
-class CommitteeCollection:
+print(dir(base))
+
+class CommitteeCollection(BaseModel):
     """ A collection of committees """
     def __init__(self, data):
-        self._data = data
-        self._df = None
-
-    @property
-    def data(self):
-        return self._data
-    
-    @property
-    def df(self):
-        if self._df is None:
-            self._df = pd.DataFrame(self._data).astype('string')
-
-        return self._df
+        super().__init__(data)
+        self._dtypes = 'string'
 
     @classmethod
     def from_filers(cls, filer_records):

@@ -1,6 +1,7 @@
-from datetime import datetime
+""" main, to run everything """
 import json
-from model.Committee import CommitteeCollection
+from model.committee import CommitteeCollection
+from model.election import ElectionCollection
 
 def get_last_status(status_list):
     """
@@ -40,6 +41,12 @@ def main():
     committees_df = committees.df
     fops_filers = committees_df.loc[committees_df['Filer_NamL'].str.contains('Friends of Oakland Public Schools')]
     print(fops_filers)
+
+    with open('data/elections.json', encoding='utf8') as f:
+        elections_json = json.loads(f.read())
+
+    elections = ElectionCollection(elections_json)
+    print(elections.data)
 
 if __name__ == '__main__':
     main()
