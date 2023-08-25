@@ -1,10 +1,7 @@
 """ This is the Committee model """
-from .base import BaseModel
 from . import base
 
-print(dir(base))
-
-class CommitteeCollection(BaseModel):
+class CommitteeCollection(base.BaseModel):
     """ A collection of committees """
     def __init__(self, data):
         super().__init__(data)

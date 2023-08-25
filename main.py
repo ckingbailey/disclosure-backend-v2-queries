@@ -1,5 +1,6 @@
 """ main, to run everything """
 import json
+from sqlalchemy import create_engine
 from model.committee import CommitteeCollection
 from model.election import ElectionCollection
 
@@ -18,35 +19,21 @@ def unique_statuses(filers):
 
 def main():
     """ Do everyting """
-    with open('data/filers.json', encoding='utf8') as f:
-        filers = json.loads(f.read())
-    committees = CommitteeCollection.from_filers(filers)
-
-    print('table fields:', [
-        'Ballot_Measure_Election',
-        'Filer_ID',
-        'Filer_NamL',
-        '_Status',
-        '_Committee_Type',
-        'Ballot_Measure',
-        'Support_Or_Oppose',
-        'candidate_controlled_id',
-        'Start_Date',
-        'End_Date',
-        'data_warning',
-        'Make_Active',
-        'id'
-    ])
-
-    committees_df = committees.df
-    fops_filers = committees_df.loc[committees_df['Filer_NamL'].str.contains('Friends of Oakland Public Schools')]
-    print(fops_filers)
+    engine = create_engine('postgresql+psycopg2://localhost/disclosure-backend-v2', echo=True)
 
     with open('data/elections.json', encoding='utf8') as f:
         elections_json = json.loads(f.read())
 
     elections = ElectionCollection(elections_json)
-    print(elections.data)
+
+    with open('data/filers.json', encoding='utf8') as f:
+        filers = json.loads(f.read())
+    committees = CommitteeCollection.from_filers(filers)
+
+    committees = committees
+
+    with engine.connect() as conn:
+        elections.df.to_sql('elections', conn)
 
 if __name__ == '__main__':
     main()

@@ -11,10 +11,7 @@ class ElectionCollection(BaseModel):
         elections = []
         for el in election_records:
             caption = el['electionCaption'].split(' - ')
-            election_date = datetime.strptime(caption[0], '%m/%d/%Y')
             election_year = caption[0][-4:]
-            ordinal_day = self.ordinal(int(election_date.strftime('%-d')))
-            long_date = datetime.strftime(election_date, f'%B {ordinal_day}, %Y')
 
             if election_year in election_years:
                 election_years[election_year] += 1
@@ -24,23 +21,37 @@ class ElectionCollection(BaseModel):
             elections.append({
                 'location': 'Oakland',
                 'date': el['electionDate'],
+                'election_type': caption[1]
             })
 
+        # Compose election slugs
         for el in elections:
+            election_date = datetime.strptime(el['date'], '%Y-%m-%d')
+            ordinal_day = self.ordinal(int(election_date.strftime('%-d')))
+            election_year = el['date'][:4]
+            long_date = datetime.strftime(election_date, f'%B {ordinal_day}, %Y')
+
+            election_type = el.pop('election_type')
+
             namef = f'oakland-%s{election_year}'
             titlef = f'Oakland {long_date} %sElection'
 
-            if election_years[el['date'][:4]] > 1:
+            if election_years[election_year] > 1:
                 name = (namef % (f'{datetime.strftime(election_date, "%B")}-')).lower()
-                title = titlef % (f'{caption[1]} ')
             else:
                 name = namef % ''
-                title = titlef % ''
+            title = titlef % (f'{election_type} ')
 
             el['name'] = name
             el['title'] = title
 
         super().__init__(elections)
+        self._dtypes = {
+            'title': 'string',
+            'name': 'string',
+            'location': 'string',
+            'date': 'string'
+        }
 
     @staticmethod
     def ordinal(n):
