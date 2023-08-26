@@ -24,16 +24,20 @@ def main():
     with open('data/elections.json', encoding='utf8') as f:
         elections_json = json.loads(f.read())
 
-    elections = ElectionCollection(elections_json)
+    elections = ElectionCollection(elections_json).df
 
     with open('data/filers.json', encoding='utf8') as f:
         filers = json.loads(f.read())
-    committees = CommitteeCollection.from_filers(filers)
 
-    committees = committees
+    committees = CommitteeCollection.from_filers(filers, elections)
 
     with engine.connect() as conn:
-        elections.df.to_sql('elections', conn)
+        common_opts = {
+            'index_label': 'id',
+            'if_exists': 'replace'
+        }
+        elections.to_sql('elections', conn, **common_opts)
+        committees.df.to_sql('committees', conn, **common_opts)
 
 if __name__ == '__main__':
     main()
