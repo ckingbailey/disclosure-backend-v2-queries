@@ -31,6 +31,13 @@ def main():
 
     committees = CommitteeCollection.from_filers(filers, elections)
 
+    # A-Contribs:
+    # join filers + filings + elections + transactions
+    # transactions.filing_nid -> filings.filing_nid
+    #   filings.filer_nid -> committees.filer_nid
+    #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
+    # where trans['transaction']['calTransactionType'] == 'F460A'
+
     with engine.connect() as conn:
         common_opts = {
             'index_label': 'id',
