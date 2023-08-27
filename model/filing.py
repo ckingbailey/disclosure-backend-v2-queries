@@ -6,6 +6,7 @@ class FilingCollection(BaseModel):
     def __init__(self, filings):
         super().__init__([
             {
+                'filing_nid': f['filingNid'],
                 'filer_nid': f['filerMeta']['filerId'],
                 'Rpt_Num': f['filingMeta']['amendmentSequence'],
                 'Rpt_Date': f['filingMeta']['legalFilingDate'],

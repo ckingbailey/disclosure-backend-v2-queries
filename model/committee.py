@@ -14,6 +14,7 @@ class CommitteeCollection(base.BaseModel):
         """ Reshape NetFile filer records """
         return cls([
             {
+                'filer_nid': f['filerNid'],
                 'Ballot_Measure_Election': elections[elections['date'] == infl['electionDate']]['name'].array[0],
                 'Filer_ID': f['registrations'].get('CA SOS'),
                 'Filer_NamL': infl['committeeName'],
@@ -23,6 +24,7 @@ class CommitteeCollection(base.BaseModel):
                                     else 'Multiple Types'),
                 'Ballot_Measure': infl['measure'].get('measureNumber') if infl['measure'] else None,
                 'Support_Or_Oppose': infl['doesSupport'],
+                'candidate_controlled_id': None, # TODO: link to candidates if candidate committee
                 'Start_Date': infl['startDate'],
                 'End_Date': infl['endDate'],
                 'data_warning': None,
