@@ -17,7 +17,7 @@ class FilingCollection(BaseModel):
 
         self._dtypes = {
             'filer_nid': int,
-            'Rpt_Num': int,
+            'Rpt_Num': 'Int64',
             'Rpt_Date': 'string',
             'From_Date': 'string',
             'Thru_Date': 'string'

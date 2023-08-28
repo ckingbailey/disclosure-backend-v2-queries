@@ -1,7 +1,8 @@
 """ Transcations """
 from .base import BaseModel
 
-class Transaction(BaseModel):
+class TransactionCollection(BaseModel):
+    """ A collection of transactions """
     def __init__(self, transactions):
         super().__init__([
             {
@@ -65,7 +66,7 @@ class Transaction(BaseModel):
                 'Memo_Code': tran['memoCode'],
                 'Memo_RefNo': tran['memoRefNo'],
                 'BakRef_TID': tran['bakRefTID'],
-                'XRef_SchNm': tran['xrefSchNm'],
+                'XRef_SchNm': tran['xrefSchNum'],
                 'XRef_Match': tran['xrefMatch'],
                 'Loan_Rate': tran['loanRate'],
                 'Int_CmteId': tran['intCmteId']
