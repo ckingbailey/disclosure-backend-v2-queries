@@ -3,6 +3,8 @@ import json
 from sqlalchemy import create_engine
 from model.committee import CommitteeCollection
 from model.election import ElectionCollection
+from model.filing import FilingCollection
+from model.transaction import TransactionCollection
 
 def get_last_status(status_list):
     """
@@ -37,6 +39,15 @@ def main():
     #   filings.filer_nid -> committees.filer_nid
     #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
     # where trans['transaction']['calTransactionType'] == 'F460A'
+    with open('data/filings.json', encoding='utf8') as f:
+        filings = FilingCollection(json.loads(f.read()))
+
+    print(filings.df.head())
+
+    with open('data/transactions.json', encoding='utf8') as f:
+        transactions = TransactionCollection(json.loads(f.read()))
+
+    print(transactions.df.head())
 
     with engine.connect() as conn:
         common_opts = {
