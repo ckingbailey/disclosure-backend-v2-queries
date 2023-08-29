@@ -1,6 +1,7 @@
 """ main, to run everything """
 import json
 from sqlalchemy import create_engine
+from model.a_contributions import A_Contributions
 from model.committee import CommitteeCollection
 from model.election import ElectionCollection
 from model.filing import FilingCollection
@@ -31,7 +32,7 @@ def main():
     with open('data/filers.json', encoding='utf8') as f:
         filers = json.loads(f.read())
 
-    committees = CommitteeCollection.from_filers(filers, elections)
+    committees = CommitteeCollection.from_filers(filers, elections).df
 
     # A-Contribs:
     # join filers + filings + elections + transactions
@@ -40,22 +41,21 @@ def main():
     #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
     # where trans['transaction']['calTransactionType'] == 'F460A'
     with open('data/filings.json', encoding='utf8') as f:
-        filings = FilingCollection(json.loads(f.read()))
-
-    print(filings.df.head())
+        filings = FilingCollection(json.loads(f.read())).df
 
     with open('data/transactions.json', encoding='utf8') as f:
-        transactions = TransactionCollection(json.loads(f.read()))
+        transactions = TransactionCollection(json.loads(f.read())).df
 
-    print(transactions.df.head())
+    a_contributions = A_Contributions(transactions, filings, committees, elections).df
+    print(a_contributions.head())
 
-    with engine.connect() as conn:
-        common_opts = {
-            'index_label': 'id',
-            'if_exists': 'replace'
-        }
-        elections.to_sql('elections', conn, **common_opts)
-        committees.df.to_sql('committees', conn, **common_opts)
+    # with engine.connect() as conn:
+    #     common_opts = {
+    #         'index_label': 'id',
+    #         'if_exists': 'replace'
+    #     }
+    #     elections.to_sql('elections', conn, **common_opts)
+    #     committees.df.to_sql('committees', conn, **common_opts)
 
 if __name__ == '__main__':
     main()
