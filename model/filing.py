@@ -8,7 +8,7 @@ class FilingCollection(BaseModel):
             {
                 'filing_nid': f['filingNid'],
                 'filer_nid': f['filerMeta']['filerId'],
-                'Rpt_Num': f['filingMeta']['amendmentSequence'],
+                'Report_Num': f['filingMeta']['amendmentSequence'],
                 'Rpt_Date': f['filingMeta']['legalFilingDate'],
                 'From_Date': f['filingMeta']['startDate'],
                 'Thru_Date': f['filingMeta']['endDate'],
@@ -17,7 +17,7 @@ class FilingCollection(BaseModel):
 
         self._dtypes = {
             'filer_nid': int,
-            'Rpt_Num': 'Int64',
+            'Report_Num': 'Int64',
             'Rpt_Date': 'string',
             'From_Date': 'string',
             'Thru_Date': 'string'
