@@ -49,13 +49,14 @@ def main():
     a_contributions = A_Contributions(transactions, filings, committees, elections).df
     print(a_contributions.head())
 
-    # with engine.connect() as conn:
-    #     common_opts = {
-    #         'index_label': 'id',
-    #         'if_exists': 'replace'
-    #     }
-    #     elections.to_sql('elections', conn, **common_opts)
-    #     committees.df.to_sql('committees', conn, **common_opts)
+    with engine.connect() as conn:
+        common_opts = {
+            'index_label': 'id',
+            'if_exists': 'replace'
+        }
+        elections.to_sql('elections', conn, **common_opts)
+        committees.drop(columns=['filer_nid']).to_sql('committees', conn, **common_opts)
+        a_contributions.to_sql('A_Contributions', conn, **common_opts)
 
 if __name__ == '__main__':
     main()
