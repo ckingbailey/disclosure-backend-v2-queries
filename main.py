@@ -46,17 +46,40 @@ def main():
     with open('data/transactions.json', encoding='utf8') as f:
         transactions = TransactionCollection(json.loads(f.read())).df
 
-    a_contributions = A_Contributions(transactions, filings, committees, elections).df
-    print(a_contributions.head())
+    a_contributions = A_Contributions(transactions, filings, committees, elections)
+    a_contribs_df = a_contributions.df
+    print(a_contribs_df.drop(columns=[
+        'Form_Type',
+        'tblCover_Offic_Dscr',
+        'tblCover_Office_Cd',
+        'XRef_SchNm',
+        'XRef_Match',
+        'Loan_Rate',
+        'Int_CmteId',
+        'Memo_RefNo',
+        'BakRef_TID',
+        'Bal_Juris',
+        'Bal_Num',
+        'Sup_Opp_Cd'
+    ]).head())
+    not_na_df = a_contribs_df[a_contribs_df['Sup_Opp_Cd'].notna()]
+    print(not_na_df.head())
+    print(a_contribs_df[['Entity_Cd','Report_Num','Committee_Type']][
+        (a_contribs_df['Entity_Cd'].str.len() > 3)
+        | (a_contribs_df['Committee_Type'].str.len() > 3)].head()
+    )
+    print(a_contribs_df['Committee_Type'].unique())
+    print(a_contribs_df['Report_Num'].unique())
+    print(a_contribs_df['Entity_Cd'].unique())
 
     with engine.connect() as conn:
         common_opts = {
             'index_label': 'id',
             'if_exists': 'replace'
         }
-        elections.to_sql('elections', conn, **common_opts)
-        committees.drop(columns=['filer_nid']).to_sql('committees', conn, **common_opts)
-        a_contributions.to_sql('A_Contributions', conn, **common_opts)
+        # elections.to_sql('elections', conn, **common_opts)
+        # committees.drop(columns=['filer_nid']).to_sql('committees', conn, **common_opts)
+        a_contributions.to_sql(conn, **common_opts)
 
 if __name__ == '__main__':
     main()

@@ -7,7 +7,21 @@ class CommitteeCollection(base.BaseModel):
     """ A collection of committees """
     def __init__(self, data:List[dict]):
         super().__init__(data)
-        self._dtypes = 'string'
+        self._dtypes = {
+            'filer_nid': int,
+            'Ballot_Measure_Election': 'string',
+            'Filer_ID': 'string',
+            'Filer_NamL': 'string',
+            '_Status': 'string',
+            '_Committee_Type': 'string',
+            'Ballot_Measure': 'string',
+            'Support_Or_Oppose': 'string',
+            'candidate_controlled_id': 'string',
+            'Start_Date': 'string',
+            'End_Date': 'string',
+            'data_warning': 'string',
+            'Make_Active': 'string'
+        }
 
     @classmethod
     def from_filers(cls, filer_records:List[dict], elections:pd.DataFrame):
