@@ -64,13 +64,7 @@ def main():
     ]).head())
     not_na_df = a_contribs_df[a_contribs_df['Sup_Opp_Cd'].notna()]
     print(not_na_df.head())
-    print(a_contribs_df[['Entity_Cd','Report_Num','Committee_Type']][
-        (a_contribs_df['Entity_Cd'].str.len() > 3)
-        | (a_contribs_df['Committee_Type'].str.len() > 3)].head()
-    )
-    print(a_contribs_df['Committee_Type'].unique())
-    print(a_contribs_df['Report_Num'].unique())
-    print(a_contribs_df['Entity_Cd'].unique())
+    print(a_contribs_df[['Rpt_Date','Tran_City', 'Tran_State']][a_contribs_df['Tran_City'].str.len() > 22])
 
     with engine.connect() as conn:
         common_opts = {
