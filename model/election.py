@@ -36,7 +36,7 @@ class ElectionCollection(BaseModel):
             namef = f'oakland-%s{election_year}'
             titlef = f'Oakland {long_date} %sElection'
 
-            if election_years[election_year] > 1:
+            if election_years[election_year] > 1 and election_date.month != 11:
                 name = (namef % (f'{datetime.strftime(election_date, "%B")}-')).lower()
             else:
                 name = namef % ''
