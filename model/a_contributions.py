@@ -14,43 +14,40 @@ class A_Contributions(BaseModel):
         self,
         transactions:pd.DataFrame,
         filings:pd.DataFrame,
-        committees:pd.DataFrame,
-        elections: pd.DataFrame
+        committees:pd.DataFrame
     ):
         f460a_trans = transactions.loc[transactions['cal_tran_type'] == 'F460A'].drop(
             columns=['cal_tran_type']
         )
-        f460a = committees.merge(filings, on='filer_nid', how='left').drop(
-            columns=[
-                'filer_nid',
-                '_Status',
-                'Ballot_Measure',
-                'Support_Or_Oppose',
-                'candidate_controlled_id',
-                'Start_Date',
-                'End_Date',
-                'data_warning',
-                'Make_Active'
-            ]
+        print('num 460A trans', len(f460a_trans.index))
+
+        unique_committees = committees.groupby(['Filer_ID'], as_index=False).first()[
+            ['filer_nid','Filer_ID','Filer_NamL','_Committee_Type']
+        ]
+        print('num unique committee IDs', len(unique_committees.index))
+
+        print('num filings', len(filings.index))
+        committee_filings = unique_committees.merge(filings, on='filer_nid', how='left').drop(
+            columns=['filer_nid']
         ).rename(
             columns={
                 'RptNum': 'Report_Num',
                 '_Committee_Type': 'Committee_Type'
             }
-        ).merge(f460a_trans,
-            how='left',
+        )
+        print('num filings x committees', len(committee_filings.index))
+
+        committees_sans_filings = committee_filings[committee_filings['filing_nid'].isna()]
+        print('committees without filings', len(committees_sans_filings.index))
+
+        f460a = committee_filings.merge(f460a_trans,
+            how='inner',
             on='filing_nid'
         ).drop(
             columns=['filing_nid']
-        ).merge(elections, how='inner', left_on='Ballot_Measure_Election', right_on='name').drop(
-            columns=[
-                'Ballot_Measure_Election',
-                'title',
-                'name',
-                'location'
-            ]
-        ).rename(columns={'date': 'Elect_Date'})
-        
+        )
+        print('num trans x filing-committees', len(f460a))
+
         f460a[['Form_Type','tblCover_Offic_Dscr','tblCover_Office_Cd']] = ['00:00:00', '', '']
 
         super().__init__(f460a)
@@ -136,13 +133,13 @@ class A_Contributions(BaseModel):
             'Filer_ID': VARCHAR(9),
             'Filer_NamL': VARCHAR(183),
             'Report_Num': INTEGER,
-            'Committee_Type': VARCHAR(32),
+            'Committee_Type': VARCHAR(64),
             'Rpt_Date': DATE,
             'From_Date': DATE,
             'Thru_Date': DATE,
             'Elect_Date': DATE,
-            'tblCover_Office_Cd': VARCHAR(32),
-            'tblCover_Offic_Dscr': VARCHAR(32),
+            'tblCover_Office_Cd': VARCHAR(64),
+            'tblCover_Offic_Dscr': VARCHAR(64),
             'Rec_Type': VARCHAR(4),
             'Form_Type': TIME,
             'Tran_ID': VARCHAR(12),
@@ -153,7 +150,7 @@ class A_Contributions(BaseModel):
             'Tran_NamS': VARCHAR(5),
             'Tran_Adr1': VARCHAR(64),
             'Tran_Adr2': VARCHAR(64),
-            'Tran_City': VARCHAR(32),
+            'Tran_City': VARCHAR(50),
             'Tran_State': VARCHAR(4),
             'Tran_Zip4': VARCHAR(10),
             'Tran_Emp': VARCHAR(92),
@@ -168,45 +165,45 @@ class A_Contributions(BaseModel):
             'Cmte_ID': VARCHAR(9),
             'Tres_NamL': VARCHAR(4),
             'Tres_NamF': VARCHAR(4),
-            'Tres_NamT': VARCHAR(32),
-            'Tres_NamS': VARCHAR(32),
-            'Tres_Adr1': VARCHAR(32),
-            'Tres_Adr2': VARCHAR(32),
+            'Tres_NamT': VARCHAR(64),
+            'Tres_NamS': VARCHAR(64),
+            'Tres_Adr1': VARCHAR(64),
+            'Tres_Adr2': VARCHAR(64),
             'Tres_City': VARCHAR(7),
             'Tres_State': VARCHAR(4),
             'Tres_Zip': INTEGER,
             'Intr_NamL': VARCHAR(74),
             'Intr_NamF': VARCHAR(6),
-            'Intr_NamT': VARCHAR(32),
-            'Intr_NamS': VARCHAR(32),
-            'Intr_Adr1': VARCHAR(32),
-            'Intr_Adr2': VARCHAR(32),
+            'Intr_NamT': VARCHAR(64),
+            'Intr_NamS': VARCHAR(64),
+            'Intr_Adr1': VARCHAR(64),
+            'Intr_Adr2': VARCHAR(64),
             'Intr_City': VARCHAR(13),
             'Intr_State': VARCHAR(4),
             'Intr_Zip4': VARCHAR(10),
             'Intr_Emp': VARCHAR(15),
             'Intr_Occ': VARCHAR(8),
             'Intr_Self': BOOLEAN,
-            'Cand_NamL': VARCHAR(32),
-            'Cand_NamF': VARCHAR(32),
-            'Cand_NamT': VARCHAR(32),
-            'Cand_NamS': VARCHAR(32),
+            'Cand_NamL': VARCHAR(64),
+            'Cand_NamF': VARCHAR(64),
+            'Cand_NamT': VARCHAR(64),
+            'Cand_NamS': VARCHAR(64),
             'tblDetlTran_Office_Cd': VARCHAR(4),
             'tblDetlTran_Offic_Dscr': VARCHAR(19),
             'Juris_Cd': VARCHAR(4),
-            'Juris_Dscr': VARCHAR(32),
-            'Dist_No': VARCHAR(32),
-            'Off_S_H_Cd': VARCHAR(32),
-            'Bal_Name': VARCHAR(32),
+            'Juris_Dscr': VARCHAR(64),
+            'Dist_No': VARCHAR(64),
+            'Off_S_H_Cd': VARCHAR(64),
+            'Bal_Name': VARCHAR(64),
             'Bal_Num': VARCHAR(4),
-            'Bal_Juris': VARCHAR(32),
-            'Sup_Opp_Cd': VARCHAR(32),
-            'Memo_Code': VARCHAR(32),
+            'Bal_Juris': VARCHAR(64),
+            'Sup_Opp_Cd': VARCHAR(64),
+            'Memo_Code': VARCHAR(64),
             'Memo_RefNo': VARCHAR(11),
-            'BakRef_TID': VARCHAR(32),
-            'XRef_SchNm': VARCHAR(32),
-            'XRef_Match': VARCHAR(32),
-            'Loan_Rate': VARCHAR(32),
+            'BakRef_TID': VARCHAR(64),
+            'XRef_SchNm': VARCHAR(64),
+            'XRef_Match': VARCHAR(64),
+            'Loan_Rate': VARCHAR(64),
             'Int_CmteId': INTEGER
         }
         self._sql_cols = list(self._sql_dtypes.keys())
