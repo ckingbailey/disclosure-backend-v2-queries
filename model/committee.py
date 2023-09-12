@@ -26,12 +26,19 @@ class CommitteeCollection(base.BaseModel):
     @classmethod
     def from_filers(cls, filer_records:List[dict], elections:pd.DataFrame):
         """ Reshape NetFile filer records """
+        empty_election_influence = {
+            'electionDate': None,
+            'measure': None,
+            'doesSupport': None,
+            'startDate': None,
+            'endDate': None
+        }
         return cls([
             {
                 'filer_nid': f['filerNid'],
-                'Ballot_Measure_Election': elections[elections['date'] == infl['electionDate']]['name'].array[0],
+                'Ballot_Measure_Election': [ *elections[elections['date'] == infl['electionDate']]['name'].array, None ][0],
                 'Filer_ID': f['registrations'].get('CA SOS'),
-                'Filer_NamL': infl['committeeName'],
+                'Filer_NamL': infl.get('committeeName', f['filerName']),
                 '_Status': 'INACTIVE' if f['isTerminated'] else 'ACTIVE',
                 '_Committee_Type': (f['committeeTypes'][0]
                                     if len(f['committeeTypes']) == 1
@@ -44,5 +51,10 @@ class CommitteeCollection(base.BaseModel):
                 'data_warning': None,
                 'Make_Active': None
             } for f in filer_records
-            for infl in f['electionInfluences']
+            for infl in (
+                f['electionInfluences']
+                if f['electionInfluences']
+                else [ empty_election_influence ]
+            )
+            if f['registrations'].get('CA SOS')
         ])
