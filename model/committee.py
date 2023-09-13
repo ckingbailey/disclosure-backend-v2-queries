@@ -23,12 +23,24 @@ class CommitteeCollection(base.BaseModel):
             'Make_Active': 'string'
         }
 
+    @staticmethod
+    def support_or_oppose(influence):
+        """
+        Return 'S' or 'O' code only for committees that support or oppose measures,
+        or committees that oppose candidates
+        """
+        sup_opp_cd = 'S' if influence['doesSupport'] else 'O'
+
+        if (influence['measure'] is not None or influence['candidate'] and sup_opp_cd == 'O'):
+            return sup_opp_cd
+
     @classmethod
     def from_filers(cls, filer_records:List[dict], elections:pd.DataFrame):
         """ Reshape NetFile filer records """
         empty_election_influence = {
             'electionDate': None,
             'measure': None,
+            'candidate': None,
             'doesSupport': None,
             'startDate': None,
             'endDate': None
@@ -44,7 +56,7 @@ class CommitteeCollection(base.BaseModel):
                                     if len(f['committeeTypes']) == 1
                                     else 'Multiple Types'),
                 'Ballot_Measure': infl['measure'].get('measureNumber') if infl['measure'] else None,
-                'Support_Or_Oppose': infl['doesSupport'],
+                'Support_Or_Oppose': cls.support_or_oppose(infl),
                 'candidate_controlled_id': None, # TODO: link to candidates if candidate committee
                 'Start_Date': infl['startDate'],
                 'End_Date': infl['endDate'],
