@@ -19,14 +19,11 @@ class A_Contributions(BaseModel):
         f460a_trans = transactions.loc[transactions['cal_tran_type'] == 'F460A'].drop(
             columns=['cal_tran_type']
         )
-        print('num 460A trans', len(f460a_trans.index))
 
         unique_committees = committees.groupby(['Filer_ID'], as_index=False).first()[
             ['filer_nid','Filer_ID','Filer_NamL','_Committee_Type']
         ]
-        print('num unique committee IDs', len(unique_committees.index))
 
-        print('num filings', len(filings.index))
         committee_filings = unique_committees.merge(filings, on='filer_nid', how='left').drop(
             columns=['filer_nid']
         ).rename(
@@ -35,10 +32,8 @@ class A_Contributions(BaseModel):
                 '_Committee_Type': 'Committee_Type'
             }
         )
-        print('num filings x committees', len(committee_filings.index))
 
         committees_sans_filings = committee_filings[committee_filings['filing_nid'].isna()]
-        print('committees without filings', len(committees_sans_filings.index))
 
         f460a = committee_filings.merge(f460a_trans,
             how='inner',
@@ -46,7 +41,6 @@ class A_Contributions(BaseModel):
         ).drop(
             columns=['filing_nid']
         )
-        print('num trans x filing-committees', len(f460a))
 
         f460a[['Form_Type','tblCover_Offic_Dscr','tblCover_Office_Cd']] = ['00:00:00', '', '']
 
