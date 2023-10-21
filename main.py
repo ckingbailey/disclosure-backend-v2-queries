@@ -69,7 +69,7 @@ def main():
         'tblCover_Offic_Dscr',
         'tblCover_Office_Cd',
         'tblDetlTran_Office_Cd',
-        'tblDetlTran_Offic_Dscr'
+        'tblDetlTran_Offic_Dscr',
         'XRef_SchNm',
         'XRef_Match',
     ]).sample(n=20))
