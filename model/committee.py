@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy.types import String
 from . import base
 
-class CommitteeCollection(base.BaseModel):
+class Committees(base.BaseModel):
     """ A collection of committees """
     def __init__(self, data:List[dict]):
         super().__init__(data)

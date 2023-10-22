@@ -5,9 +5,9 @@ import json
 import pandas as pd
 from sqlalchemy import create_engine
 from model.a_contributions import A_Contributions
-from model.committee import CommitteeCollection
-from model.election import ElectionCollection
-from model.filing import FilingCollection
+from model.committee import Committees
+from model.election import Elections
+from model.filing import Filings
 from model.transaction import TransactionCollection
 
 def get_last_status(status_list):
@@ -30,12 +30,12 @@ def main():
     with open('data/elections.json', encoding='utf8') as f:
         elections_json = json.loads(f.read())
 
-    elections = ElectionCollection(elections_json)
+    elections = Elections(elections_json)
 
     with open('data/filers.json', encoding='utf8') as f:
         filers = json.loads(f.read())
 
-    committees = CommitteeCollection.from_filers(filers, elections.df)
+    committees = Committees.from_filers(filers, elections.df)
 
     # A-Contribs:
     # join filers + filings + elections + transactions
@@ -44,7 +44,7 @@ def main():
     #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
     # where trans['transaction']['calTransactionType'] == 'F460A'
     with open('data/filings.json', encoding='utf8') as f:
-        filings = FilingCollection(json.loads(f.read())).df
+        filings = Filings(json.loads(f.read())).df
 
     with open('data/transactions.json', encoding='utf8') as f:
         records = json.loads(f.read())

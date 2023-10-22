@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.types import String
 from .base import BaseModel
 
-class ElectionCollection(BaseModel):
+class Elections(BaseModel):
     """ A collection of elections """
     def __init__(self, election_records):
         election_years = {}

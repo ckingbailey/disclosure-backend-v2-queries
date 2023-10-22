@@ -1,7 +1,7 @@
 """ Filings """
 from .base import BaseModel
 
-class FilingCollection(BaseModel):
+class Filings(BaseModel):
     """ A collection of filings """
     def __init__(self, filings):
         super().__init__([
