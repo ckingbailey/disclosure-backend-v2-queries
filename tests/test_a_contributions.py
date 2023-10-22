@@ -9,13 +9,13 @@ from model.a_contributions import A_Contributions
 from model.committee import Committees
 from model.election import Elections
 from model.filing import Filings
-from model.transaction import TransactionCollection
+from model.transaction import Transactions
 
 @pytest.fixture(name='transactions')
 def load_transactions():
     """ load transactions from json """
     with open('data/transactions.json', encoding='utf8') as f:
-        yield TransactionCollection(json.loads(f.read())).df
+        yield Transactions(json.loads(f.read())).df
 
 @pytest.fixture(name='filings')
 def load_filings():

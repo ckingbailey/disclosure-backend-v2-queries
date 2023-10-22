@@ -8,7 +8,7 @@ from model.a_contributions import A_Contributions
 from model.committee import Committees
 from model.election import Elections
 from model.filing import Filings
-from model.transaction import TransactionCollection
+from model.transaction import Transactions
 
 def get_last_status(status_list):
     """
@@ -48,7 +48,7 @@ def main():
 
     with open('data/transactions.json', encoding='utf8') as f:
         records = json.loads(f.read())
-        transactions = TransactionCollection(records).df
+        transactions = Transactions(records).df
 
     a_contributions = A_Contributions(transactions, filings, committees.df)
     a_contribs_df = a_contributions.df

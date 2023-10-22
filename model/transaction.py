@@ -1,7 +1,7 @@
 """ Transactions """
 from .base import BaseModel
 
-class TransactionCollection(BaseModel):
+class Transactions(BaseModel):
     """ A collection of transactions """
     def __init__(self, transactions):
         super().__init__([
