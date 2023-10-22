@@ -1,8 +1,14 @@
 """ main, to run everything """
+from collections import Counter
+from datetime import datetime
 import json
+import pandas as pd
 from sqlalchemy import create_engine
-from model.committee import CommitteeCollection
-from model.election import ElectionCollection
+from model.a_contributions import A_Contributions
+from model.committee import Committees
+from model.election import Elections
+from model.filing import Filings
+from model.transaction import Transactions
 
 def get_last_status(status_list):
     """
@@ -24,20 +30,54 @@ def main():
     with open('data/elections.json', encoding='utf8') as f:
         elections_json = json.loads(f.read())
 
-    elections = ElectionCollection(elections_json).df
+    elections = Elections(elections_json)
 
     with open('data/filers.json', encoding='utf8') as f:
         filers = json.loads(f.read())
 
-    committees = CommitteeCollection.from_filers(filers, elections)
+    committees = Committees.from_filers(filers, elections.df)
+
+    # A-Contribs:
+    # join filers + filings + elections + transactions
+    # transactions.filing_nid -> filings.filing_nid
+    #   filings.filer_nid -> committees.filer_nid
+    #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
+    # where trans['transaction']['calTransactionType'] == 'F460A'
+    with open('data/filings.json', encoding='utf8') as f:
+        filings = Filings(json.loads(f.read())).df
+
+    with open('data/transactions.json', encoding='utf8') as f:
+        records = json.loads(f.read())
+        transactions = Transactions(records).df
+
+    a_contributions = A_Contributions(transactions, filings, committees.df)
+    a_contribs_df = a_contributions.df
+    print(a_contribs_df.drop(columns=[
+        'BakRef_TID',
+        'Bal_Name',
+        'Bal_Juris',
+        'Bal_Num',
+        'Dist_No',
+        'Form_Type',
+        'Int_CmteId',
+        'Juris_Cd',
+        'Juris_Dscr',
+        'Loan_Rate',
+        'Memo_Code',
+        'Memo_RefNo',
+        'Off_S_H_Cd',
+        'tblCover_Offic_Dscr',
+        'tblCover_Office_Cd',
+        'tblDetlTran_Office_Cd',
+        'tblDetlTran_Offic_Dscr',
+        'XRef_SchNm',
+        'XRef_Match',
+    ]).sample(n=20))
 
     with engine.connect() as conn:
-        common_opts = {
-            'index_label': 'id',
-            'if_exists': 'replace'
-        }
-        elections.to_sql('elections', conn, **common_opts)
-        committees.df.to_sql('committees', conn, **common_opts)
+        elections.to_sql(conn)
+        committees.to_sql(conn)
+        a_contributions.to_sql(conn)
 
 if __name__ == '__main__':
     main()

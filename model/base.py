@@ -7,6 +7,9 @@ class BaseModel:
         self._data = data
         self._df = None
         self._dtypes = []
+        self._sql_dtypes = []
+        self._sql_cols = []
+        self._sql_table_name = ''
 
     @property
     def data(self):
@@ -16,7 +19,22 @@ class BaseModel:
     @property
     def df(self):
         """ Get a dataframe of the data """
-        if not self._df:
+        if self._df is None or self._df.empty:
             self._df = pd.DataFrame(self._data).astype(self._dtypes)
 
         return self._df
+    
+    def to_sql(self, connection, **kwargs):
+        """ Write to a postgresql table """
+        options = {
+            'index_label': 'id',
+            'if_exists': 'replace'
+        }
+        options.update(kwargs)
+
+        self.df[self._sql_cols].to_sql(
+            self._sql_table_name,
+            connection,
+            dtype=self._sql_dtypes,
+            **options
+        )
