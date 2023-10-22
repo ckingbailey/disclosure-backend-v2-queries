@@ -30,12 +30,12 @@ def main():
     with open('data/elections.json', encoding='utf8') as f:
         elections_json = json.loads(f.read())
 
-    elections = ElectionCollection(elections_json).df
+    elections = ElectionCollection(elections_json)
 
     with open('data/filers.json', encoding='utf8') as f:
         filers = json.loads(f.read())
 
-    committees = CommitteeCollection.from_filers(filers, elections).df
+    committees = CommitteeCollection.from_filers(filers, elections.df)
 
     # A-Contribs:
     # join filers + filings + elections + transactions
@@ -50,7 +50,7 @@ def main():
         records = json.loads(f.read())
         transactions = TransactionCollection(records).df
 
-    a_contributions = A_Contributions(transactions, filings, committees)
+    a_contributions = A_Contributions(transactions, filings, committees.df)
     a_contribs_df = a_contributions.df
     print(a_contribs_df.drop(columns=[
         'BakRef_TID',
@@ -75,13 +75,9 @@ def main():
     ]).sample(n=20))
 
     with engine.connect() as conn:
-        common_opts = {
-            'index_label': 'id',
-            'if_exists': 'replace'
-        }
-        elections.to_sql('elections', conn, **common_opts)
-        committees.drop(columns=['filer_nid']).to_sql('committees', conn, **common_opts)
-        a_contributions.to_sql(conn, **common_opts)
+        elections.to_sql(conn)
+        committees.to_sql(conn)
+        a_contributions.to_sql(conn)
 
 if __name__ == '__main__':
     main()

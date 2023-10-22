@@ -1,6 +1,7 @@
 """ This is the Committee model """
 from typing import List
 import pandas as pd
+from sqlalchemy.types import String
 from . import base
 
 class CommitteeCollection(base.BaseModel):
@@ -22,6 +23,22 @@ class CommitteeCollection(base.BaseModel):
             'data_warning': 'string',
             'Make_Active': 'string'
         }
+        self._sql_dtypes = {
+            'Ballot_Measure_Election': String,
+            'Filer_ID': String,
+            'Filer_NamL': String,
+            '_Status': String,
+            '_Committee_Type': String,
+            'Ballot_Measure': String,
+            'Support_Or_Oppose': String,
+            'candidate_controlled_id': String,
+            'Start_Date': String,
+            'End_Date': String,
+            'data_warning': String,
+            'Make_Active': String
+        }
+        self._sql_cols = self._sql_dtypes.keys()
+        self._sql_table_name = 'committees'
 
     @staticmethod
     def support_or_oppose(influence):
