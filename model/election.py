@@ -27,7 +27,7 @@ class ElectionCollection(BaseModel):
         # Compose election slugs
         for el in elections:
             election_date = datetime.strptime(el['date'], '%Y-%m-%d')
-            ordinal_day = self.ordinal(int(election_date.strftime('%d')))
+            ordinal_day = self.ordinal(int(election_date.strftime('%-d')))
             election_year = el['date'][:4]
             long_date = datetime.strftime(election_date, f'%B {ordinal_day}, %Y')
 
