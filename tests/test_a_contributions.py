@@ -38,8 +38,7 @@ def load_committees(elections):
 def test_a_contributions_has_expected_fields(
     transactions,
     filings,
-    committees,
-    elections
+    committees
 ):
     """
     Test that A_Contributions has expect fields
