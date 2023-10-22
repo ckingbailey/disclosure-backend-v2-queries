@@ -1,4 +1,4 @@
-""" Transcations """
+""" Transactions """
 from .base import BaseModel
 
 class TransactionCollection(BaseModel):
