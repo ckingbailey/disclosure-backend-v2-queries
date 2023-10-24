@@ -50,38 +50,39 @@ def main():
     #   filings.filer_nid -> committees.filer_nid
     #     committees.Ballot_Measure_Election -> elections.Ballot_Measure_Election
     # where trans['transaction']['calTransactionType'] == 'F460A'
-    with open('data/filings.json', encoding='utf8') as f:
+    with open(f'{data_dir_path}/filings.json', encoding='utf8') as f:
         filings = Filings(json.loads(f.read())).df
 
-    with open('data/transactions.json', encoding='utf8') as f:
+    with open(f'{data_dir_path}/transactions.json', encoding='utf8') as f:
         records = json.loads(f.read())
         transactions = Transactions(records).df
 
     a_contributions = A_Contributions(transactions, filings, committees.df)
     a_contribs_df = a_contributions.df
-    print(a_contribs_df.drop(columns=[
-        'BakRef_TID',
-        'Bal_Name',
-        'Bal_Juris',
-        'Bal_Num',
-        'Dist_No',
-        'Form_Type',
-        'Int_CmteId',
-        'Juris_Cd',
-        'Juris_Dscr',
-        'Loan_Rate',
-        'Memo_Code',
-        'Memo_RefNo',
-        'Off_S_H_Cd',
-        'tblCover_Offic_Dscr',
-        'tblCover_Office_Cd',
-        'tblDetlTran_Office_Cd',
-        'tblDetlTran_Offic_Dscr',
-        'XRef_SchNm',
-        'XRef_Match',
-    ]).sample(n=20))
+    if not a_contribs_df.empty:
+        print(a_contribs_df.drop(columns=[
+            'BakRef_TID',
+            'Bal_Name',
+            'Bal_Juris',
+            'Bal_Num',
+            'Dist_No',
+            'Form_Type',
+            'Int_CmteId',
+            'Juris_Cd',
+            'Juris_Dscr',
+            'Loan_Rate',
+            'Memo_Code',
+            'Memo_RefNo',
+            'Off_S_H_Cd',
+            'tblCover_Offic_Dscr',
+            'tblCover_Office_Cd',
+            'tblDetlTran_Office_Cd',
+            'tblDetlTran_Offic_Dscr',
+            'XRef_SchNm',
+            'XRef_Match',
+        ]).sample(n=20))
 
-    elections.to_csv('.local/elections.csv', index=False)
+    elections.df.to_csv('.local/elections.csv', index=False)
     committees.df.to_csv('.local/committees.csv', index=False)
     a_contributions.df.to_csv('.local/a_contributions.csv', index=False)
 
