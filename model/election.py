@@ -1,6 +1,7 @@
 """
 This is the Election model
 """
+import os
 from datetime import datetime
 from sqlalchemy.types import String
 from .base import BaseModel
@@ -28,7 +29,11 @@ class Elections(BaseModel):
         # Compose election slugs
         for el in elections:
             election_date = datetime.strptime(el['date'], '%Y-%m-%d')
-            ordinal_day = self.ordinal(int(election_date.strftime('%-d')))
+            if os.name == 'nt':
+                day_format_str = '%#d'
+            else:
+                day_format_str = '%-d'
+            ordinal_day = self.ordinal(int(election_date.strftime(day_format_str)))
             election_year = el['date'][:4]
             long_date = datetime.strftime(election_date, f'%B {ordinal_day}, %Y')
 
