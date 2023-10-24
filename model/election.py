@@ -2,9 +2,10 @@
 This is the Election model
 """
 from datetime import datetime
+from sqlalchemy.types import String
 from .base import BaseModel
 
-class ElectionCollection(BaseModel):
+class Elections(BaseModel):
     """ A collection of elections """
     def __init__(self, election_records):
         election_years = {}
@@ -36,7 +37,7 @@ class ElectionCollection(BaseModel):
             namef = f'oakland-%s{election_year}'
             titlef = f'Oakland {long_date} %sElection'
 
-            if election_years[election_year] > 1:
+            if election_years[election_year] > 1 and election_date.month != 11:
                 name = (namef % (f'{datetime.strftime(election_date, "%B")}-')).lower()
             else:
                 name = namef % ''
@@ -52,6 +53,14 @@ class ElectionCollection(BaseModel):
             'location': 'string',
             'date': 'string'
         }
+        self._sql_dtypes = {
+            'title': String,
+            'name': String,
+            'location': String,
+            'date': String
+        }
+        self._sql_cols = self._sql_dtypes.keys()
+        self._sql_table_name = 'elections'
 
     @staticmethod
     def ordinal(n):
