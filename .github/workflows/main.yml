@@ -11,7 +11,7 @@ jobs:
       GDRIVE_FOLDER: ${{ vars.GDRIVE_FOLDER }}
     steps:
     - uses: actions/checkout@v3
-    - run: "pip install -r gdrive_requirements.txt"
+    - run: "pip install -r requirements.txt"
     - run: "python test_pull_from_gdrive.py"
     - name: Archive pulled files
       uses: actions/upload-artifact@v2
